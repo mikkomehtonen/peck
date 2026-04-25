@@ -15,12 +15,13 @@ describe('kiss init', () => {
     expect(stdout).toMatch(/Done/)
   })
 
-  it('creates the planner agent file', async () => {
+  it('installs all agents except orchestrator', async () => {
     await run(['init'], tmpDir)
-    const dest = join(tmpDir, '.opencode', 'agents', 'planner.md')
-    await expect(access(dest)).resolves.toBeUndefined()
-    const content = await readFile(dest, 'utf8')
-    expect(content).toMatch(/Planner Agent/)
+    const agentsDir = join(tmpDir, '.opencode', 'agents')
+    for (const name of ['planner.md', 'implementer.md', 'code-reviewer.md', 'acceptance-reviewer.md', 'research.md']) {
+      await expect(access(join(agentsDir, name))).resolves.toBeUndefined()
+    }
+    await expect(access(join(agentsDir, 'orchestrator.md'))).rejects.toThrow()
   })
 
   it('creates the spec-review skill file', async () => {
