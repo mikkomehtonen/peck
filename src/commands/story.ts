@@ -1,9 +1,11 @@
 import { Command } from 'commander'
-import { writeFile, readFile, mkdir } from 'fs/promises'
-import { readdirSync, existsSync } from 'fs'
-import { join } from 'path'
+import { writeFile, readFile, mkdir } from 'node:fs/promises'
+import { readdirSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
+import type { Dirent } from 'node:fs'
 import { getRepoRoot, git } from '../lib/git.js'
 import { readConfig } from '../lib/config.js'
+import { fatal } from '../lib/fatal.js'
 import storyTemplate from '../assets/templates/story.md'
 import productTemplate from '../assets/templates/product.md'
 
@@ -14,12 +16,10 @@ export function storyCommand(): Command {
     .command('create <name>')
     .description('Scaffold a new story, create a git branch, output JSON for the planner agent')
     .action(async (name: string) => {
-      const cwd = process.cwd()
-      const repoRoot = await getRepoRoot(cwd)
+      const repoRoot = await getRepoRoot(process.cwd())
       const config = await readConfig(repoRoot)
       const storiesDir = join(repoRoot, 'stories')
 
-      // Sync with remote then reset to latest default branch
       try {
         await git(['fetch', '--all', '--prune'], repoRoot)
       } catch {
@@ -60,22 +60,17 @@ export function storyCommand(): Command {
   story
     .command('list')
     .description('List all stories')
-    .action(() => {
-      const storiesDir = join(process.cwd(), 'stories')
-      if (!existsSync(storiesDir)) {
-        console.log('No stories yet. Run `kiss-spec story create <name>` to create one.')
-        return
-      }
-      const entries = readdirSync(storiesDir, { withFileTypes: true })
-        .filter(e => e.isDirectory())
-        .sort((a, b) => a.name.localeCompare(b.name))
+    .action(async () => {
+      const repoRoot = await getRepoRoot(process.cwd())
+      const storiesDir = join(repoRoot, 'stories')
+      const entries = storyDirs(storiesDir)
 
       if (entries.length === 0) {
         console.log('No stories yet. Run `kiss-spec story create <name>` to create one.')
         return
       }
 
-      for (const entry of entries) {
+      for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
         const match = entry.name.match(/^(\d+)-(.+)$/)
         if (match) {
           console.log(`  ${match[1]}  ${match[2]}`)
@@ -89,13 +84,11 @@ export function storyCommand(): Command {
     .command('load <slug>')
     .description('Print a story to stdout (pipe into your AI tool)')
     .action(async (slug: string) => {
-      const storiesDir = join(process.cwd(), 'stories')
+      const repoRoot = await getRepoRoot(process.cwd())
+      const storiesDir = join(repoRoot, 'stories')
       const storyFile = findStory(storiesDir, slug)
 
-      if (!storyFile) {
-        process.stderr.write(`Story not found: ${slug}\n`)
-        process.exit(1)
-      }
+      if (!storyFile) fatal(`Story not found: ${slug}`)
 
       process.stdout.write(await readFile(storyFile, 'utf8'))
     })
@@ -103,42 +96,35 @@ export function storyCommand(): Command {
   return story
 }
 
-async function nextFeatureNumber(storiesDir: string, repoRoot: string): Promise<number> {
-  const fromDirs = highestFromDirs(storiesDir)
-  const fromBranches = await highestFromBranches(repoRoot)
-  return Math.max(fromDirs, fromBranches) + 1
+function storyDirs(storiesDir: string): Dirent[] {
+  if (!existsSync(storiesDir)) return []
+  return readdirSync(storiesDir, { withFileTypes: true }).filter(e => e.isDirectory())
 }
 
-function highestFromDirs(storiesDir: string): number {
-  if (!existsSync(storiesDir)) return 0
-  let highest = 0
-  for (const entry of readdirSync(storiesDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
-    const match = entry.name.match(/^(\d+)/)
-    if (match) highest = Math.max(highest, parseInt(match[1], 10))
-  }
-  return highest
+async function nextFeatureNumber(storiesDir: string, repoRoot: string): Promise<number> {
+  const fromDirs = Math.max(0, ...storyDirs(storiesDir).map(e => {
+    const m = e.name.match(/^(\d+)/)
+    return m ? parseInt(m[1], 10) : 0
+  }))
+  const fromBranches = await highestFromBranches(repoRoot)
+  return Math.max(fromDirs, fromBranches) + 1
 }
 
 async function highestFromBranches(repoRoot: string): Promise<number> {
   try {
     const output = await git(['branch', '-a'], repoRoot)
-    let highest = 0
-    for (const line of output.split('\n')) {
+    return Math.max(0, ...output.split('\n').map(line => {
       const clean = line.replace(/^[* ]*/, '').replace(/^remotes\/[^/]*\//, '')
-      const match = clean.match(/^(\d{3})-/)
-      if (match) highest = Math.max(highest, parseInt(match[1], 10))
-    }
-    return highest
+      const m = clean.match(/^(\d{3})-/)
+      return m ? parseInt(m[1], 10) : 0
+    }))
   } catch {
     return 0
   }
 }
 
 function findStory(storiesDir: string, slug: string): string | null {
-  if (!existsSync(storiesDir)) return null
-  for (const entry of readdirSync(storiesDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
+  for (const entry of storyDirs(storiesDir)) {
     if (entry.name === slug || entry.name.endsWith(`-${slug}`) || entry.name.includes(slug)) {
       const candidate = join(storiesDir, entry.name, 'story.md')
       if (existsSync(candidate)) return candidate

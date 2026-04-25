@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { existsSync } from 'node:fs'
+import { fatal } from './fatal.js'
 
 export interface KissConfig {
   version: string
@@ -13,10 +14,7 @@ export function configPath(repoRoot: string): string {
 
 export async function readConfig(repoRoot: string): Promise<KissConfig> {
   const path = configPath(repoRoot)
-  if (!existsSync(path)) {
-    process.stderr.write(`Error: kiss-spec config not found at ${path}. Run \`kiss-spec init\` first.\n`)
-    process.exit(1)
-  }
+  if (!existsSync(path)) fatal(`kiss-spec config not found at ${path}. Run \`kiss-spec init\` first.`)
   return JSON.parse(await readFile(path, 'utf8')) as KissConfig
 }
 

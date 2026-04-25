@@ -1,5 +1,6 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import { fatal } from './fatal.js'
 
 const execFileAsync = promisify(execFile)
 
@@ -8,8 +9,7 @@ export async function getRepoRoot(cwd: string): Promise<string> {
     const { stdout } = await execFileAsync('git', ['rev-parse', '--show-toplevel'], { cwd })
     return stdout.trim()
   } catch {
-    process.stderr.write('Error: not a git repository\n')
-    process.exit(1)
+    fatal('not a git repository')
   }
 }
 
@@ -21,7 +21,6 @@ export async function git(args: string[], cwd: string): Promise<string> {
 const CANDIDATE_BRANCHES = ['master', 'main', 'dev']
 
 export async function detectDefaultBranch(repoRoot: string): Promise<string> {
-  // Try remote HEAD first (reliable for cloned repos)
   try {
     const ref = await git(['symbolic-ref', 'refs/remotes/origin/HEAD'], repoRoot)
     const branch = ref.replace('refs/remotes/origin/', '').trim()
@@ -30,7 +29,6 @@ export async function detectDefaultBranch(repoRoot: string): Promise<string> {
     // no remote or HEAD not set
   }
 
-  // Fall back to checking which candidate branch exists locally
   for (const branch of CANDIDATE_BRANCHES) {
     try {
       await git(['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], repoRoot)
@@ -40,8 +38,5 @@ export async function detectDefaultBranch(repoRoot: string): Promise<string> {
     }
   }
 
-  process.stderr.write(
-    `Error: could not detect default branch. Expected one of: ${CANDIDATE_BRANCHES.join(', ')}\n`
-  )
-  process.exit(1)
+  fatal(`could not detect default branch. Expected one of: ${CANDIDATE_BRANCHES.join(', ')}`)
 }
