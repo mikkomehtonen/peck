@@ -24,12 +24,12 @@ describe('kiss init', () => {
     await expect(access(join(agentsDir, 'orchestrator.md'))).rejects.toThrow()
   })
 
-  it('creates the spec-review skill file', async () => {
+  it('creates the reflect skill directory and SKILL.md', async () => {
     await run(['init'], tmpDir)
-    const dest = join(tmpDir, '.claude', 'skills', 'spec-review.md')
+    const dest = join(tmpDir, '.claude', 'skills', 'reflect', 'SKILL.md')
     await expect(access(dest)).resolves.toBeUndefined()
     const content = await readFile(dest, 'utf8')
-    expect(content).toMatch(/Spec Review/)
+    expect(content).toMatch(/reflect/)
   })
 
   it('skips existing files without overwriting', async () => {
