@@ -2,6 +2,9 @@ import { Command } from 'commander'
 import { writeFile, mkdir } from 'fs/promises'
 import { join, dirname } from 'path'
 import { existsSync } from 'fs'
+import { getRepoRoot, detectDefaultBranch } from '../lib/git.js'
+import { configPath, writeConfig } from '../lib/config.js'
+import pkg from '../../package.json'
 import acceptanceReviewer from '../assets/agents/acceptance-reviewer.md'
 import codeReviewer from '../assets/agents/code-reviewer.md'
 import implementer from '../assets/agents/implementer.md'
@@ -17,7 +20,6 @@ const AGENTS: Record<string, string> = {
   'research.md': research,
 }
 
-// Keys are relative paths within .claude/skills/
 const SKILLS: Record<string, string> = {
   'reflect/SKILL.md': reflectSkill,
 }
@@ -26,15 +28,27 @@ export function initCommand(): Command {
   return new Command('init')
     .description('Install spec-driven development setup into the current project')
     .action(async () => {
-      const cwd = process.cwd()
+      const repoRoot = await getRepoRoot(process.cwd())
 
-      console.log('Initializing kiss-spec in', cwd)
+      console.log('Initializing kiss-spec in', repoRoot)
 
-      await installFiles(cwd, join('.opencode', 'agents'), AGENTS)
-      await installFiles(cwd, join('.claude', 'skills'), SKILLS)
+      await installFiles(repoRoot, join('.opencode', 'agents'), AGENTS)
+      await installFiles(repoRoot, join('.claude', 'skills'), SKILLS)
+      await initConfig(repoRoot)
 
       console.log('Done. Run `kiss-spec story create` to start your first story.')
     })
+}
+
+async function initConfig(repoRoot: string): Promise<void> {
+  const path = configPath(repoRoot)
+  if (existsSync(path)) {
+    console.log('  skip  .opencode/kiss-spec.json (already exists)')
+    return
+  }
+  const defaultBranch = await detectDefaultBranch(repoRoot)
+  await writeConfig(repoRoot, { version: pkg.version, default_branch: defaultBranch })
+  console.log(`  write .opencode/kiss-spec.json (default_branch: ${defaultBranch})`)
 }
 
 async function installFiles(cwd: string, subdir: string, files: Record<string, string>) {

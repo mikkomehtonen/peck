@@ -2,12 +2,10 @@ import { Command } from 'commander'
 import { writeFile, readFile, mkdir } from 'fs/promises'
 import { readdirSync, existsSync } from 'fs'
 import { join } from 'path'
-import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
+import { getRepoRoot, git } from '../lib/git.js'
+import { readConfig } from '../lib/config.js'
 import storyTemplate from '../assets/templates/story.md'
 import productTemplate from '../assets/templates/product.md'
-
-const execFileAsync = promisify(execFile)
 
 export function storyCommand(): Command {
   const story = new Command('story').description('Manage stories')
@@ -18,12 +16,20 @@ export function storyCommand(): Command {
     .action(async (name: string) => {
       const cwd = process.cwd()
       const repoRoot = await getRepoRoot(cwd)
+      const config = await readConfig(repoRoot)
       const storiesDir = join(repoRoot, 'stories')
 
+      // Sync with remote then reset to latest default branch
       try {
         await git(['fetch', '--all', '--prune'], repoRoot)
       } catch {
         // non-fatal — offline or no remotes
+      }
+      await git(['checkout', config.default_branch], repoRoot)
+      try {
+        await git(['pull', '--ff-only'], repoRoot)
+      } catch {
+        // non-fatal — no upstream set
       }
 
       const num = await nextFeatureNumber(storiesDir, repoRoot)
@@ -95,21 +101,6 @@ export function storyCommand(): Command {
     })
 
   return story
-}
-
-async function getRepoRoot(cwd: string): Promise<string> {
-  try {
-    const { stdout } = await execFileAsync('git', ['rev-parse', '--show-toplevel'], { cwd })
-    return stdout.trim()
-  } catch {
-    process.stderr.write('Error: not a git repository\n')
-    process.exit(1)
-  }
-}
-
-async function git(args: string[], cwd: string): Promise<string> {
-  const { stdout } = await execFileAsync('git', args, { cwd })
-  return stdout.trim()
 }
 
 async function nextFeatureNumber(storiesDir: string, repoRoot: string): Promise<number> {

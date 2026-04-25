@@ -1,12 +1,28 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { readFile, access } from 'node:fs/promises'
+import { readFile, access, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { run, makeTmpDir, removeTmpDir } from './helpers.js'
 
-describe('kiss init', () => {
+const execFileAsync = promisify(execFile)
+
+async function initGitRepo(dir: string, defaultBranch = 'main') {
+  await execFileAsync('git', ['init', '-b', defaultBranch], { cwd: dir })
+  await execFileAsync('git', ['config', 'user.email', 'test@test.com'], { cwd: dir })
+  await execFileAsync('git', ['config', 'user.name', 'Test'], { cwd: dir })
+  await writeFile(join(dir, 'README.md'), '# test')
+  await execFileAsync('git', ['add', '.'], { cwd: dir })
+  await execFileAsync('git', ['commit', '--no-gpg-sign', '-m', 'init'], { cwd: dir })
+}
+
+describe('kiss-spec init', () => {
   let tmpDir: string
 
-  beforeEach(async () => { tmpDir = await makeTmpDir() })
+  beforeEach(async () => {
+    tmpDir = await makeTmpDir()
+    await initGitRepo(tmpDir)
+  })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
   it('exits 0 and prints a done message', async () => {
@@ -32,16 +48,36 @@ describe('kiss init', () => {
     expect(content).toMatch(/reflect/)
   })
 
+  it('creates .opencode/kiss-spec.json with version and default_branch', async () => {
+    await run(['init'], tmpDir)
+    const config = JSON.parse(await readFile(join(tmpDir, '.opencode', 'kiss-spec.json'), 'utf8'))
+    expect(config).toHaveProperty('version')
+    expect(config).toHaveProperty('default_branch', 'main')
+  })
+
+  it('skips kiss-spec.json if it already exists', async () => {
+    await run(['init'], tmpDir)
+    const path = join(tmpDir, '.opencode', 'kiss-spec.json')
+    await writeFile(path, JSON.stringify({ version: '0.0.0', default_branch: 'master' }), 'utf8')
+    await run(['init'], tmpDir)
+    const config = JSON.parse(await readFile(path, 'utf8'))
+    expect(config.default_branch).toBe('master')
+  })
+
   it('skips existing files without overwriting', async () => {
     await run(['init'], tmpDir)
     const dest = join(tmpDir, '.opencode', 'agents', 'planner.md')
-    // Overwrite with sentinel
-    const { writeFile } = await import('node:fs/promises')
     await writeFile(dest, 'SENTINEL', 'utf8')
-
     const { stdout } = await run(['init'], tmpDir)
     expect(stdout).toMatch(/skip/)
-    const content = await readFile(dest, 'utf8')
-    expect(content).toBe('SENTINEL')
+    expect(await readFile(dest, 'utf8')).toBe('SENTINEL')
+  })
+
+  it('exits 1 when not a git repository', async () => {
+    const notGit = await makeTmpDir()
+    const { exitCode, stderr } = await run(['init'], notGit)
+    expect(exitCode).toBe(1)
+    expect(stderr).toMatch(/not a git repository/)
+    await removeTmpDir(notGit)
   })
 })

@@ -8,13 +8,17 @@ import { run, makeTmpDir, removeTmpDir } from './helpers.js'
 const execFileAsync = promisify(execFile)
 
 async function initGitRepo(dir: string) {
-  await execFileAsync('git', ['init'], { cwd: dir })
+  await execFileAsync('git', ['init', '-b', 'main'], { cwd: dir })
   await execFileAsync('git', ['config', 'user.email', 'test@test.com'], { cwd: dir })
   await execFileAsync('git', ['config', 'user.name', 'Test'], { cwd: dir })
-  // initial commit so branches can be created
   await writeFile(join(dir, 'README.md'), '# test')
   await execFileAsync('git', ['add', '.'], { cwd: dir })
   await execFileAsync('git', ['commit', '--no-gpg-sign', '-m', 'init'], { cwd: dir })
+}
+
+async function kissInit(dir: string) {
+  const { exitCode, stderr } = await run(['init'], dir)
+  if (exitCode !== 0) throw new Error(`kiss-spec init failed: ${stderr}`)
 }
 
 describe('kiss-spec story create', () => {
@@ -23,6 +27,7 @@ describe('kiss-spec story create', () => {
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
+    await kissInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
@@ -85,6 +90,7 @@ describe('kiss-spec story list', () => {
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
+    await kissInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
@@ -96,13 +102,7 @@ describe('kiss-spec story list', () => {
 
   it('lists stories with number and slug', async () => {
     await run(['story', 'create', 'first feature'], tmpDir)
-    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
-      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
-    )
     await run(['story', 'create', 'second feature'], tmpDir)
-    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
-      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
-    )
     const { exitCode, stdout } = await run(['story', 'list'], tmpDir)
     expect(exitCode).toBe(0)
     expect(stdout).toMatch(/001.*first-feature/)
@@ -116,6 +116,7 @@ describe('kiss-spec story load', () => {
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
+    await kissInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
