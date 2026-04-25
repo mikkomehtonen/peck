@@ -6,7 +6,7 @@ import { storyCommand } from './commands/story.js'
 const program = new Command()
 
 program
-  .name('kiss')
+  .name('kiss-spec')
   .description('Spec-driven development CLI')
   .version('0.1.0')
 
