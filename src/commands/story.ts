@@ -52,6 +52,34 @@ export function storyCommand(): Command {
     })
 
   story
+    .command('list')
+    .description('List all stories')
+    .action(() => {
+      const storiesDir = join(process.cwd(), 'stories')
+      if (!existsSync(storiesDir)) {
+        console.log('No stories yet. Run `kiss-spec story create <name>` to create one.')
+        return
+      }
+      const entries = readdirSync(storiesDir, { withFileTypes: true })
+        .filter(e => e.isDirectory())
+        .sort((a, b) => a.name.localeCompare(b.name))
+
+      if (entries.length === 0) {
+        console.log('No stories yet. Run `kiss-spec story create <name>` to create one.')
+        return
+      }
+
+      for (const entry of entries) {
+        const match = entry.name.match(/^(\d+)-(.+)$/)
+        if (match) {
+          console.log(`  ${match[1]}  ${match[2]}`)
+        } else {
+          console.log(`  ${entry.name}`)
+        }
+      }
+    })
+
+  story
     .command('load <slug>')
     .description('Print a story to stdout (pipe into your AI tool)')
     .action(async (slug: string) => {

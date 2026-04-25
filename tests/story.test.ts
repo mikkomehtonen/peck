@@ -79,6 +79,37 @@ describe('kiss-spec story create', () => {
   })
 })
 
+describe('kiss-spec story list', () => {
+  let tmpDir: string
+
+  beforeEach(async () => {
+    tmpDir = await makeTmpDir()
+    await initGitRepo(tmpDir)
+  })
+  afterEach(async () => { await removeTmpDir(tmpDir) })
+
+  it('shows a message when there are no stories', async () => {
+    const { exitCode, stdout } = await run(['story', 'list'], tmpDir)
+    expect(exitCode).toBe(0)
+    expect(stdout).toMatch(/No stories yet/)
+  })
+
+  it('lists stories with number and slug', async () => {
+    await run(['story', 'create', 'first feature'], tmpDir)
+    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
+      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
+    )
+    await run(['story', 'create', 'second feature'], tmpDir)
+    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
+      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
+    )
+    const { exitCode, stdout } = await run(['story', 'list'], tmpDir)
+    expect(exitCode).toBe(0)
+    expect(stdout).toMatch(/001.*first-feature/)
+    expect(stdout).toMatch(/002.*second-feature/)
+  })
+})
+
 describe('kiss-spec story load', () => {
   let tmpDir: string
 
