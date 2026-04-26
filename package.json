@@ -11,7 +11,8 @@
     "dev": "tsup --watch",
     "start": "node dist/index.js",
     "test": "npm run build && vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "install:local": "npm run build && npm install -g ."
   },
   "dependencies": {
     "commander": "^14.0.3"

@@ -33,10 +33,10 @@ export function initCommand(): Command {
       console.log('Initializing kiss-spec in', repoRoot)
 
       await installFiles(repoRoot, join('.opencode', 'agents'), AGENTS)
-      await installFiles(repoRoot, join('.claude', 'skills'), SKILLS)
+      await installFiles(repoRoot, join('.opencode', 'skills'), SKILLS)
       await initConfig(repoRoot)
 
-      console.log('Done. Run `kiss-spec story create` to start your first story.')
+      console.log('Done.')
     })
 }
 
