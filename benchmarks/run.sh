@@ -30,19 +30,24 @@ MODEL_ID="$(jq -r '.model' "$MODEL_CONFIG")"
 setup_run "$TASK_DIR" "$CASE" "$MODEL_NAME"
 echo "==> Run: $RUN_DIR"
 
-copy_revim "$CHECKOUT" "$AGENT_FILE"
+copy_revim "$CHECKOUT" "$AGENT_FILE" "${PATCH_AGENT_MODEL:+$MODEL_ID}"
 PRE_HEAD=$(git -C "$REVIM_TMP" rev-parse HEAD)
 
-echo "==> Running $AGENT"
+AGENT_ARG=(); [[ -n "${AGENT:-}" ]] && AGENT_ARG=(--agent "$AGENT")
+echo "==> Running${AGENT:+ $AGENT}"
 T0=$SECONDS
-(cd "$REVIM_TMP" && opencode run --agent "$AGENT" --model "$MODEL_ID" --dangerously-skip-permissions --title "$MODEL_NAME $CASE $RUN_NUMBER" "$INPUT") | tee "$RUN_DIR/agent-log.md"
+(cd "$REVIM_TMP" && opencode run "${AGENT_ARG[@]}" --model "$MODEL_ID" --dangerously-skip-permissions --title "$MODEL_NAME $CASE $RUN_NUMBER" "$INPUT") | tee "$RUN_DIR/agent-log.md" || true
 DURATION=$(( SECONDS - T0 ))
 echo "==> Done in ${DURATION}s"
 
 COMMIT_MSG=$(git -C "$REVIM_TMP" log --format="%B" "$PRE_HEAD..HEAD" | head -50)
-VERDICT=$(git -C "$REVIM_TMP" log --format="%s" "$PRE_HEAD..HEAD" \
-  | grep -oiE '\b(Pass|Fail|Block)\b' | head -1 \
-  | sed 's/[Bb]lock/Fail/' || echo "no-commit")
+if declare -f compute_verdict > /dev/null; then
+  VERDICT=$(compute_verdict "$REVIM_TMP" "$PRE_HEAD")
+else
+  VERDICT=$(git -C "$REVIM_TMP" log --format="%s" "$PRE_HEAD..HEAD" \
+    | grep -oiE '\b(Pass|Fail|Block)\b' | head -1 \
+    | sed 's/[Bb]lock/Fail/' || echo "no-commit")
+fi
 echo "==> Verdict: $VERDICT  (expected: $EXPECTED)"
 
 cat > "$RUN_DIR/report.md" <<EOF

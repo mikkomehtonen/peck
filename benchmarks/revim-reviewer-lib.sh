@@ -22,14 +22,18 @@ setup_run() {
   exec {lock_fd}>&-
 }
 
+# copy_revim CHECKOUT AGENT_FILE [MODEL_ID]
+# If MODEL_ID is given, the agent file's model line is patched to that value.
 copy_revim() {
-  local checkout=$1 agent_file=$2
+  local checkout=$1 agent_file=$2 model_id=${3:-}
   REVIM_TMP="$RUN_DIR/revim"
   cp -r "$REVIM_SOURCE/." "$REVIM_TMP"
-  git -C "$REVIM_TMP" checkout -f "$checkout" --quiet
+  git -C "$REVIM_TMP" checkout master --quiet 2>/dev/null || true
+  git -C "$REVIM_TMP" reset --hard "$checkout" --quiet
   (cd "$REVIM_TMP" && node "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/dist/index.js" init)
   sed -i "s|^mode: subagent|mode: all|" "$REVIM_TMP/.opencode/agents/$agent_file"
+  [[ -n "$model_id" ]] && sed -i "s|^model:.*|model: $model_id|" "$REVIM_TMP/.opencode/agents/$agent_file"
   git -C "$REVIM_TMP" add .opencode
   git -C "$REVIM_TMP" commit --quiet -m "chore: kiss-spec init"
-  echo "==> Checked out $checkout, ran kiss-spec init, set mode=all in $agent_file" >&2
+  echo "==> Checked out $checkout, ran kiss-spec init, agent=$agent_file${model_id:+, model=$model_id}" >&2
 }
