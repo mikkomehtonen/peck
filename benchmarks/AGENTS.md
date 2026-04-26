@@ -8,19 +8,22 @@ Each benchmark directory contains a `config.sh` defining the agent and test case
 
 - `revim-acceptance-reviewer/` — tests the `acceptance-reviewer` agent
 - `revim-code-reviewer/` — tests the `code-reviewer` agent
+- `revim-planner/` — tests the `planner` agent on revim story 010
 
 ## Running
 
 Single run:
 ```bash
-./run.sh --benchmark revim-acceptance-reviewer --case 007-1 --model /path/to/model.json
+./run.sh --benchmark revim-acceptance-reviewer --case 010-1 --model models/sonnet-4.6.json
+./run.sh --benchmark revim-code-reviewer      --case 010-2 --model models/sonnet-4.6.json
+./run.sh --benchmark revim-planner            --case 010-1 --model models/sonnet-4.6.json
 ```
 
 Multiple models in parallel:
 ```bash
 ./run-parallel.sh --benchmark revim-acceptance-reviewer --case 007-1 --runs 3 \
-  --model /path/to/model-a.json \
-  --model /path/to/model-b.json
+  --model models/model-a.json \
+  --model models/model-b.json
 ```
 
-Model configs live in `~/ai/BENCHMARKING/models/`. Cases ending in `-1` expect `fail`, `-2` expect `pass`.
+Model configs live in `benchmarks/models/`. Cases ending in `-1` expect `fail`, `-2` expect `pass`.
