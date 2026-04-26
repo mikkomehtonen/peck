@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Usage: ./run.sh --benchmark DIR --case CASE --model MODEL_CONFIG
 # Cases (acceptance-reviewer): 009-1 pass, 010-1 pass
+# Cases (code-reviewer):       013-1 fail, 012-1 fail, 010-1 fail, 010-2 pass
 set -euo pipefail
 
 BENCHMARKS_DIR="$(cd "$(dirname "$0")" && pwd)"
