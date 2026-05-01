@@ -1,0 +1,13 @@
+code-reviewer case:
+    ./run-parallel.sh --benchmark revim-code-reviewer --case {{case}} \
+        --model kimi-k2.6 \
+        --model minimax-m2.7 \
+        --model deepseek-v4-flash \
+        --model deepseek-v4-flash:high \
+        --model deepseek-v4-pro:high \
+        --model deepseek-v4-pro:max \
+        --model glm-5.1 \
+        --model qwen3.6-plus \
+        --model mimo-v2.5:low \
+        --model mimo-v2.5:medium \
+        --model mimo-v2.5:high

@@ -40,7 +40,7 @@ You verify that an implementation satisfies a story's acceptance criteria. Final
 4. **Report and commit.** Format per the template below. Commit as an empty commit — feature name is the last path segment of the story input (`stories/007-add-undo-redo/` → `007-add-undo-redo`):
    ```bash
    git commit --allow-empty --no-gpg-sign -F - << 'EOF'
-   acceptance(<feature>): <Pass|Fail>
+   review(<feature>): acceptance-reviewer report:
 
    <full report>
    EOF

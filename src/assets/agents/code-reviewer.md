@@ -65,7 +65,7 @@ You are code reviewer focusing on code correctness and simplicity. Your goal is 
 
    ```bash
    git commit --allow-empty --no-gpg-sign -F - << 'EOF'
-   review(<feature>): <Pass|Fail>
+   review(<feature>): code-reviewer report:
 
    <full report>
    EOF
