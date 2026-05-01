@@ -14,16 +14,21 @@ Each benchmark directory contains a `config.sh` defining the agent and test case
 
 Single run:
 ```bash
-./run.sh --benchmark revim-acceptance-reviewer --case 010-1 --model models/sonnet-4.6.json
-./run.sh --benchmark revim-code-reviewer      --case 010-2 --model models/sonnet-4.6.json
-./run.sh --benchmark revim-planner            --case 010-1 --model models/sonnet-4.6.json
+./run.sh --benchmark revim-acceptance-reviewer --case 010-1 --model sonnet-4.6
+./run.sh --benchmark revim-code-reviewer      --case 010-2 --model sonnet-4.6
+./run.sh --benchmark revim-planner            --case 010-1 --model sonnet-4.6
+```
+
+With a thinking variant:
+```bash
+./run.sh --benchmark revim-code-reviewer --case 010-2 --model deepseek-v4-pro:max
 ```
 
 Multiple models in parallel:
 ```bash
-./run-parallel.sh --benchmark revim-acceptance-reviewer --case 007-1 --runs 3 \
-  --model models/model-a.json \
-  --model models/model-b.json
+./run-parallel.sh --benchmark revim-code-reviewer --case 010-2 --runs 3 \
+  --model sonnet-4.6 \
+  --model kimi-k2.6
 ```
 
-Model configs live in `benchmarks/models/`. Cases ending in `-1` expect `fail`, `-2` expect `pass`.
+Model names are defined in `benchmarks/models.json`. Cases ending in `-1` expect `fail`, `-2` expect `pass`.

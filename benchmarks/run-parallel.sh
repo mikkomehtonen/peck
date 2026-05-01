@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: ./run-parallel.sh --benchmark DIR --case CASE [--runs N] --model MODEL ...
+# Usage: ./run-parallel.sh --benchmark DIR --case CASE [--runs N] --model NAME ...
 #
 # Runs N iterations per model sequentially; all models run in parallel.
 set -euo pipefail
@@ -13,7 +13,7 @@ while [[ $# -gt 0 ]]; do
     --case)      CASE=$2;         shift 2 ;;
     --runs)      RUNS=$2;         shift 2 ;;
     --model)     MODELS+=("$2");  shift 2 ;;
-    *) echo "Usage: $(basename "$0") --benchmark DIR --case CASE [--runs N] --model MODEL ..." >&2; exit 1 ;;
+    *) echo "Usage: $(basename "$0") --benchmark DIR --case CASE [--runs N] --model NAME ..." >&2; exit 1 ;;
   esac
 done
 
@@ -21,27 +21,23 @@ TASK_DIR="$BENCHMARKS_DIR/$BENCHMARK"
 [[ -n "$BENCHMARK" && -n "$CASE" ]] || { echo "Error: --benchmark and --case required" >&2; exit 1; }
 [[ ${#MODELS[@]} -gt 0 ]]           || { echo "Error: at least one --model required" >&2; exit 1; }
 [[ -d "$TASK_DIR" ]]                || { echo "Error: not found: $TASK_DIR" >&2; exit 1; }
-for MODEL_CONFIG in "${MODELS[@]}"; do
-  [[ -f "$MODEL_CONFIG" ]] || { echo "Error: not found: $MODEL_CONFIG" >&2; exit 1; }
-done
 
 PIDS=(); LOGS=()
-for MODEL_CONFIG in "${MODELS[@]}"; do
+for MODEL_ARG in "${MODELS[@]}"; do
   LOG=$(mktemp); LOGS+=("$LOG")
   (
     for (( i=1; i<=RUNS; i++ )); do
-      "$BENCHMARKS_DIR/run.sh" --benchmark "$BENCHMARK" --case "$CASE" --model "$MODEL_CONFIG"
+      "$BENCHMARKS_DIR/run.sh" --benchmark "$BENCHMARK" --case "$CASE" --model "$MODEL_ARG"
     done
   ) > "$LOG" 2>&1 &
   PIDS+=($!)
-  echo "==> Spawned $(basename "$MODEL_CONFIG" .json) (pid $!)"
+  echo "==> Spawned $MODEL_ARG (pid $!)"
 done
 
 FAILED=0
 for i in "${!PIDS[@]}"; do
-  MODEL_NAME="$(basename "${MODELS[$i]}" .json)"
-  if wait "${PIDS[$i]}"; then echo "==> Done: $MODEL_NAME"
-  else echo "==> FAILED: $MODEL_NAME"; FAILED=1; fi
+  if wait "${PIDS[$i]}"; then echo "==> Done: ${MODELS[$i]}"
+  else echo "==> FAILED: ${MODELS[$i]}"; FAILED=1; fi
   cat "${LOGS[$i]}"; rm -f "${LOGS[$i]}"
 done
 
