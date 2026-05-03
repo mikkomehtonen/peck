@@ -6,7 +6,9 @@ export default defineConfig({
   target: 'node18',
   bundle: true,
   clean: true,
+  external: ['bun'],
   loader: {
     '.md': 'text',
+    '.plugin': 'text',
   },
 })

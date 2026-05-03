@@ -9,10 +9,10 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "start": "node dist/index.js",
-    "test": "npm run build && vitest run",
+    "start": "bun dist/index.js",
+    "test": "bun run build && vitest run",
     "test:watch": "vitest",
-    "install:local": "npm run build && npm install -g ."
+    "install:local": "bun run build && bun add -g $(pwd)"
   },
   "dependencies": {
     "commander": "^14.0.3"

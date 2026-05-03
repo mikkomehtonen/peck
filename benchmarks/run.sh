@@ -46,13 +46,13 @@ T0=$SECONDS
 DURATION=$(( SECONDS - T0 ))
 echo "==> Done in ${DURATION}s"
 
-COMMIT_MSG=$(git -C "$REVIM_TMP" log --format="%B" "$PRE_HEAD..HEAD" | head -50)
+REPORT=$(sed -n '/^##\+ Findings/,$p' "$RUN_DIR/agent-log.md")
 if declare -f compute_verdict > /dev/null; then
   VERDICT=$(compute_verdict "$REVIM_TMP" "$PRE_HEAD")
 else
-  VERDICT=$(git -C "$REVIM_TMP" log --format="%s" "$PRE_HEAD..HEAD" \
-    | grep -oiE '\b(Pass|Fail|Block)\b' | head -1 \
-    | sed 's/[Bb]lock/Fail/' || echo "no-commit")
+  VERDICT=$(echo "$REPORT" \
+    | grep -oiE '\b(Pass|Fail|Block)\b' | tail -1 \
+    | sed 's/[Bb]lock/Fail/' || echo "no-verdict")
 fi
 echo "==> Verdict: $VERDICT  (expected: $EXPECTED)"
 
@@ -69,7 +69,7 @@ $STATS
 
 ## Reviewer Output
 
-$COMMIT_MSG
+$REPORT
 EOF
 
 echo "==> Report → $RUN_DIR/report.md"

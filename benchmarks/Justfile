@@ -7,7 +7,4 @@ code-reviewer case:
         --model deepseek-v4-pro:high \
         --model deepseek-v4-pro:max \
         --model glm-5.1 \
-        --model qwen3.6-plus \
-        --model mimo-v2.5:low \
-        --model mimo-v2.5:medium \
-        --model mimo-v2.5:high
+        --model qwen3.6-plus

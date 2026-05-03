@@ -42,7 +42,7 @@ describe('kiss-spec init', () => {
 
   it('creates the reflect skill directory and SKILL.md', async () => {
     await run(['init'], tmpDir)
-    const dest = join(tmpDir, '.claude', 'skills', 'reflect', 'SKILL.md')
+    const dest = join(tmpDir, '.opencode', 'skills', 'reflect', 'SKILL.md')
     await expect(access(dest)).resolves.toBeUndefined()
     const content = await readFile(dest, 'utf8')
     expect(content).toMatch(/reflect/)
