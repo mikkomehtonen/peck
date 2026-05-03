@@ -39,25 +39,22 @@ You are code reviewer focusing on code correctness and simplicity. Your goal is 
 
 <steps>
 
-1. **Identify changed files.** Required: what to review. Optional: a feature name (used in the commit subject).
+1. **Identify changed files.**
+   - `uncommitted` / `working directory` → `git diff --ignore-all-space --stat HEAD`
+   - Commit SHA or `HEAD` → `git show --ignore-all-space --stat SHA`
+   - Range `BASE..HEAD` → `git diff --ignore-all-space --stat BASE..HEAD`
+   - PR number `N` / `#N` / URL → `gh pr diff --stat N` && `gh pr view N`
+   - Branch → `git symbolic-ref refs/remotes/origin/HEAD --short | cut -d/ -f2` then `git diff --ignore-all-space --stat DEFAULT...BRANCH`
 
-   - `uncommitted` / `working directory` → `git diff --stat HEAD`
-   - Commit SHA or `HEAD` → `git show --stat SHA`
-   - Commit range `BASE..HEAD` → `git diff --stat BASE..HEAD`
-   - PR number `N` / `#N` / URL → `gh pr diff --stat N` and `gh pr view N`
-   - Branch name → detect default: `git symbolic-ref refs/remotes/origin/HEAD --short | cut -d/ -f2`, then `git diff --stat DEFAULT...BRANCH`
+   If missing, ambiguous, or unrecognized: `ERROR: Invalid input. Expected 'uncommitted', a commit SHA, a range (BASE..HEAD), a PR number, or a branch name. Got: '<input>'`
+   If command fails: `ERROR: Cannot fetch diff — <reason>.`
 
-   If the input is missing, unrecognised, or ambiguous, stop:
-   `ERROR: Invalid input. Expected one of: 'uncommitted', a commit SHA, a commit range (BASE..HEAD), a PR number, or a branch name. Got: '<what was provided>'`
+2. **Filter to reviewable files.** Skip lockfiles, generated files, vendored code, snapshots, docs, markdown, story files. Fetch diffs in one command:
+   `git diff --ignore-all-space --diff-filter=ACMRT BASE..HEAD -- path/to/file1 path/to/file2`
 
-   If the command fails (invalid ref, missing remote, etc.), stop:
-   `ERROR: Cannot fetch diff — <reason>.`
+3. **Review the changes.** Use `<focus-areas>` as a guide, not an exhaustive list. Flag anything that may impact correctness, reliability, or future maintainability.
 
-   From the stat output, decide which files to open/diff. Skip files with no reviewable logic — lockfiles, snapshots, vendored code, generated files — without opening them.
-
-2. **Review the changes.** Use `<focus-areas>` as a guide, not an exhaustive list. Flag anything that may impact correctness, reliability, or future maintainability.
-
-3. **Write the report** using the format in `<output-format>`.
+4. **Write the report** using the format in `<output-format>`.
 
 </steps>
 
