@@ -46,7 +46,8 @@ T0=$SECONDS
 DURATION=$(( SECONDS - T0 ))
 echo "==> Done in ${DURATION}s"
 
-REPORT=$(sed -n '/^##\+ Findings/,$p' "$RUN_DIR/agent-log.md")
+# Extract review content — handles code-reviewer (`## Findings`, `### Correctness Issues`) and acceptance-reviewer (`## Lint`) formats
+REPORT=$(sed -n '/^\(##\+ \)\?\(Findings\|Correctness\|Lint\|review(\)/,$p' "$RUN_DIR/agent-log.md")
 if declare -f compute_verdict > /dev/null; then
   VERDICT=$(compute_verdict "$REVIM_TMP" "$PRE_HEAD")
 else
@@ -58,14 +59,18 @@ echo "==> Verdict: $VERDICT  (expected: $EXPECTED)"
 
 STATS=$(get_session_stats "$REVIM_TMP")
 
+# Write stats to separate file
+cat > "$RUN_DIR/stats.md" <<EOF
+**Duration:** ${DURATION}s
+$STATS
+EOF
+
 cat > "$RUN_DIR/report.md" <<EOF
 **Case:** $CASE
 **Model:** $MODEL_DIR_NAME
 **Run:** $RUN_NUMBER
 **Expected:** $EXPECTED
 **Verdict:** $VERDICT
-**Duration:** ${DURATION}s
-$STATS
 
 ## Reviewer Output
 

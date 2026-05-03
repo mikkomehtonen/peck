@@ -4,18 +4,24 @@ import { getRepoRoot } from '../lib/git.js'
 
 export function codeReviewCommand(): Command {
   return new Command('code-review')
-    .addCommand(commitReviewCommand())
+    .addCommand(commitReviewCommand('code-review', 'review: ${verdict}'))
 }
 
-function commitReviewCommand(): Command {
+export function acceptanceReviewCommand(): Command {
+  return new Command('acceptance-review')
+    .addCommand(commitReviewCommand('acceptance-review', 'review(acceptance): ${verdict}'))
+}
+
+function commitReviewCommand(name: string, subjectFormat: string): Command {
   return new Command('commit')
-    .description('Commit a code-reviewer report piped from stdin')
+    .description(`Commit a ${name} report piped from stdin`)
     .action(async () => {
       const repoRoot = await getRepoRoot(process.cwd())
       const report = (await Bun.stdin.text()).trim()
 
       const verdict = parseVerdict(report)
-      const hash = await commitReport(repoRoot, verdict ?? 'Unknown', report)
+      const subject = subjectFormat.replace('${verdict}', verdict ?? 'Unknown')
+      const hash = await commitReport(repoRoot, subject, report)
 
       if (verdict === 'Pass') {
         process.stdout.write(`Verdict: Pass\n`)
@@ -44,8 +50,8 @@ function parseVerdict(report: string): 'Pass' | 'Fail' | null {
   return (winner[2] ?? winner[3]).toLowerCase() === 'pass' ? 'Pass' : 'Fail'
 }
 
-async function commitReport(cwd: string, verdict: string, report: string): Promise<string> {
-  const message = `review: ${verdict}\n\n${report}`
+async function commitReport(cwd: string, subject: string, report: string): Promise<string> {
+  const message = `${subject}\n\n${report}`
   const tree = await $`git rev-parse HEAD^{tree}`.cwd(cwd).text()
   const parent = await $`git rev-parse HEAD`.cwd(cwd).text()
 
