@@ -3,7 +3,7 @@ name: research
 description: "Researches current documentation, library APIs, comparisons, and any topic requiring fresh web evidence. Can query library docs (context7, deepwiki), search GitHub repos (grep_app), and search the web. Returns answers with permalink citations."
 mode: subagent
 temperature: 0
-model: github-copilot/gpt-5.4-mini
+model: opencode-go/deepseek-v4-flash
 variant: low
 tools:
   edit: false

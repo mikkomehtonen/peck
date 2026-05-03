@@ -3,7 +3,7 @@ name: acceptance-reviewer
 description: "Acceptance reviewer. Runs linter and tests, verifies ≥90% of acceptance criteria are covered by automated tests, and surfaces what's missing. Input: path to a story directory (e.g. stories/001-rust-deno-poc, nothing else is necessary). Outputs Pass or Fail."
 mode: subagent
 temperature: 0
-model: github-copilot/gpt-5.4-mini
+model: opencode-go/minimax-m2.7
 variant: low
 tools:
   edit: false

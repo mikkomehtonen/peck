@@ -2,10 +2,8 @@
 name: implementer
 description: "Implementation agent. Use proactively once a task is scoped and ready to execute. Implements features, bug fixes, and refactors; writes tests; self-verifies via acceptance and code reviewers; returns a completion report with reviewer SHA verdicts. Not for exploration or planning."
 mode: all
-defaultTemperature: 0.2
-defaultModel: openai/gpt-5.4-mini
-skills: []
-mcps: []
+temperature: 0.2
+model: opencode-go/deepseek-v4-flash
 permissions:
   task: allow
   question: deny
