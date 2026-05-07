@@ -35,7 +35,7 @@ async function gitCommitFiles(dir: string): Promise<string> {
   return stdout.trim()
 }
 
-describe('kiss-spec code-review commit', () => {
+describe('peck code-review commit', () => {
   let tmpDir: string
 
   beforeEach(async () => {

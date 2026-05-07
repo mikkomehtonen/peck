@@ -16,7 +16,7 @@ async function initGitRepo(dir: string, defaultBranch = 'main') {
   await execFileAsync('git', ['commit', '--no-gpg-sign', '-m', 'init'], { cwd: dir })
 }
 
-describe('kiss-spec init', () => {
+describe('peck init', () => {
   let tmpDir: string
 
   beforeEach(async () => {
@@ -48,16 +48,16 @@ describe('kiss-spec init', () => {
     expect(content).toMatch(/reflect/)
   })
 
-  it('creates .opencode/kiss-spec.json with version and default_branch', async () => {
+  it('creates .opencode/peck.json with version and default_branch', async () => {
     await run(['init'], tmpDir)
-    const config = JSON.parse(await readFile(join(tmpDir, '.opencode', 'kiss-spec.json'), 'utf8'))
+    const config = JSON.parse(await readFile(join(tmpDir, '.opencode', 'peck.json'), 'utf8'))
     expect(config).toHaveProperty('version')
     expect(config).toHaveProperty('default_branch', 'main')
   })
 
-  it('skips kiss-spec.json if it already exists', async () => {
+  it('skips peck.json if it already exists', async () => {
     await run(['init'], tmpDir)
-    const path = join(tmpDir, '.opencode', 'kiss-spec.json')
+    const path = join(tmpDir, '.opencode', 'peck.json')
     await writeFile(path, JSON.stringify({ version: '0.0.0', default_branch: 'master' }), 'utf8')
     await run(['init'], tmpDir)
     const config = JSON.parse(await readFile(path, 'utf8'))

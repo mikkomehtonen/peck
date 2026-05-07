@@ -41,7 +41,7 @@ export async function runWithStdin(args: string[], cwd: string, stdin: string): 
 }
 
 export async function makeTmpDir(): Promise<string> {
-  return mkdtemp(join(tmpdir(), 'kiss-test-'))
+  return mkdtemp(join(tmpdir(), 'peck-test-'))
 }
 
 export async function removeTmpDir(dir: string): Promise<void> {

@@ -24,7 +24,7 @@ tools:
   webfetch: false
   todowrite: false
 options:
-  on_complete: kiss-spec code-review commit
+  on_complete: peck code-review commit
 ---
 
 <role>

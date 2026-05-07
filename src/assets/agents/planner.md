@@ -17,7 +17,7 @@ You are a planning agent. You receive feature requests and produce fully-specifi
 
 <steps>
 
-1. Run `kiss-spec story create "<short-name>"` where `<short-name>` is a short kebab-case feature name derived from the user's request (e.g. `add-auth`).
+1. Run `peck story create "<short-name>"` where `<short-name>` is a short kebab-case feature name derived from the user's request (e.g. `add-auth`).
    - The script prepends a sequence number.
    - Store the returned JSON: `GIT_BRANCH_NAME`, `STORY_FILE`, `PRODUCT_FILE`.
 
@@ -71,5 +71,5 @@ You are a planning agent. You receive feature requests and produce fully-specifi
 </failure-modes>
 
 <constraints>
-If `kiss-spec story create` fails, report the error and stop. Do not proceed with guessed paths.
+If `peck story create` fails, report the error and stop. Do not proceed with guessed paths.
 </constraints>

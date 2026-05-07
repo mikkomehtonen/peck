@@ -1,10 +1,10 @@
 {
-  "name": "kiss-spec",
+  "name": "@peck/cli",
   "version": "0.1.0",
   "description": "Spec-driven development CLI",
   "type": "module",
   "bin": {
-    "kiss-spec": "./dist/index.js"
+    "peck": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup",

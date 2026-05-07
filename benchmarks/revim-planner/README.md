@@ -8,7 +8,7 @@ Runs the `planner` agent against revim story 010 (vim search).
 |-------|-----------|----------|
 | 010-1 | `8307388` | pass     |
 
-The checkout is just before `010-vim-search` was created on the main branch. `kiss-spec story create` will assign the next available number.
+The checkout is just before `010-vim-search` was created on the main branch. `peck story create` will assign the next available number.
 
 ## Verdict
 

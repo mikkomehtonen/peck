@@ -16,18 +16,18 @@ async function initGitRepo(dir: string) {
   await execFileAsync('git', ['commit', '--no-gpg-sign', '-m', 'init'], { cwd: dir })
 }
 
-async function kissInit(dir: string) {
+async function peckInit(dir: string) {
   const { exitCode, stderr } = await run(['init'], dir)
-  if (exitCode !== 0) throw new Error(`kiss-spec init failed: ${stderr}`)
+  if (exitCode !== 0) throw new Error(`peck init failed: ${stderr}`)
 }
 
-describe('kiss-spec story create', () => {
+describe('peck story create', () => {
   let tmpDir: string
 
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
-    await kissInit(tmpDir)
+    await peckInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
@@ -84,13 +84,13 @@ describe('kiss-spec story create', () => {
   })
 })
 
-describe('kiss-spec story list', () => {
+describe('peck story list', () => {
   let tmpDir: string
 
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
-    await kissInit(tmpDir)
+    await peckInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
@@ -110,13 +110,13 @@ describe('kiss-spec story list', () => {
   })
 })
 
-describe('kiss-spec story load', () => {
+describe('peck story load', () => {
   let tmpDir: string
 
   beforeEach(async () => {
     tmpDir = await makeTmpDir()
     await initGitRepo(tmpDir)
-    await kissInit(tmpDir)
+    await peckInit(tmpDir)
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 

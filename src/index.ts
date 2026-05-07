@@ -7,7 +7,7 @@ import { codeReviewCommand, acceptanceReviewCommand } from './commands/review.js
 const program = new Command()
 
 program
-  .name('kiss-spec')
+  .name('peck')
   .description('Spec-driven development CLI')
   .version('0.1.0')
 

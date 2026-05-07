@@ -34,8 +34,8 @@ copy_revim() {
   sed -i "s|^mode: subagent|mode: all|" "$REVIM_TMP/.opencode/agents/$agent_file"
   [[ -n "$model_id" ]] && sed -i "s|^model:.*|model: $model_id|" "$REVIM_TMP/.opencode/agents/$agent_file"
   git -C "$REVIM_TMP" add .opencode
-  git -C "$REVIM_TMP" commit --quiet -m "chore: kiss-spec init"
-  echo "==> Checked out $checkout, ran kiss-spec init, agent=$agent_file${model_id:+, model=$model_id}" >&2
+  git -C "$REVIM_TMP" commit --quiet -m "chore: peck init"
+  echo "==> Checked out $checkout, ran peck init, agent=$agent_file${model_id:+, model=$model_id}" >&2
 }
 
 # get_session_stats DIR

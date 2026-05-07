@@ -15,7 +15,7 @@ tools:
   webfetch: false
   todowrite: false
 options:
-  on_complete: kiss-spec acceptance-review commit
+  on_complete: peck acceptance-review commit
 ---
 
 You verify that an implementation satisfies a story's acceptance criteria. Final verdict: **Pass** or **Fail**. You are read-only — do not fix, debug, or write code

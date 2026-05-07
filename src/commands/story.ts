@@ -66,7 +66,7 @@ export function storyCommand(): Command {
       const entries = storyDirs(storiesDir)
 
       if (entries.length === 0) {
-        console.log('No stories yet. Run `kiss-spec story create <name>` to create one.')
+        console.log('No stories yet. Run `peck story create <name>` to create one.')
         return
       }
 

@@ -40,7 +40,7 @@ export function initCommand(): Command {
     .action(async () => {
       const repoRoot = await getRepoRoot(process.cwd())
 
-      console.log('Initializing kiss-spec in', repoRoot)
+      console.log('Initializing peck in', repoRoot)
 
       await installFiles(repoRoot, join('.opencode', 'agents'), AGENTS)
       await installFiles(repoRoot, join('.opencode', 'skills'), SKILLS)
@@ -54,12 +54,12 @@ export function initCommand(): Command {
 async function initConfig(repoRoot: string): Promise<void> {
   const path = configPath(repoRoot)
   if (existsSync(path)) {
-    console.log('  skip  .opencode/kiss-spec.json (already exists)')
+    console.log('  skip  .opencode/peck.json (already exists)')
     return
   }
   const defaultBranch = await detectDefaultBranch(repoRoot)
   await writeConfig(repoRoot, { version: pkg.version, default_branch: defaultBranch })
-  console.log(`  write .opencode/kiss-spec.json (default_branch: ${defaultBranch})`)
+  console.log(`  write .opencode/peck.json (default_branch: ${defaultBranch})`)
 }
 
 async function initOpencodeJsonc(repoRoot: string): Promise<void> {

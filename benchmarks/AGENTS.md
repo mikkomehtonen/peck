@@ -1,6 +1,6 @@
 # Benchmarks
 
-Evaluates kiss-spec agents against the [revim](https://github.com/gytis-ivaskevicius/revim) project using known pass/fail cases.
+Evaluates peck agents against the [revim](https://github.com/gytis-ivaskevicius/revim) project using known pass/fail cases.
 
 ## Structure
 

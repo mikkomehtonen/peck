@@ -3,22 +3,22 @@ import { join, dirname } from 'node:path'
 import { existsSync } from 'node:fs'
 import { fatal } from './fatal.js'
 
-export interface KissConfig {
+export interface PeckConfig {
   version: string
   default_branch: string
 }
 
 export function configPath(repoRoot: string): string {
-  return join(repoRoot, '.opencode', 'kiss-spec.json')
+  return join(repoRoot, '.opencode', 'peck.json')
 }
 
-export async function readConfig(repoRoot: string): Promise<KissConfig> {
+export async function readConfig(repoRoot: string): Promise<PeckConfig> {
   const path = configPath(repoRoot)
-  if (!existsSync(path)) fatal(`kiss-spec config not found at ${path}. Run \`kiss-spec init\` first.`)
-  return JSON.parse(await readFile(path, 'utf8')) as KissConfig
+  if (!existsSync(path)) fatal(`peck config not found at ${path}. Run \`peck init\` first.`)
+  return JSON.parse(await readFile(path, 'utf8')) as PeckConfig
 }
 
-export async function writeConfig(repoRoot: string, config: KissConfig): Promise<void> {
+export async function writeConfig(repoRoot: string, config: PeckConfig): Promise<void> {
   const path = configPath(repoRoot)
   await mkdir(dirname(path), { recursive: true })
   await writeFile(path, JSON.stringify(config, null, 2) + '\n', 'utf8')
