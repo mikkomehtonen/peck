@@ -1,15 +1,10 @@
 ---
 name: code-reviewer
 description: >
-  Expert code reviewer for correctness, simplicity, and security.
-  Use proactively after any implementation to catch bugs, over-engineering, and security issues before merging.
-
-  Input — pass ONLY these, nothing else:
-  what to review: 'uncommitted', a commit SHA, a range BASE..HEAD, a PR number, or a branch name.
-  focus hint (optional): a short phrase like 'focus on DRY' or 'pay attention to auth'.
-
-  Output: structured Pass/Fail report committed to git with file:line findings.
-  For requirement verification use acceptance-reviewer instead.
+  Reviews code for correctness, simplicity, and security.
+  Use proactively after any implementation to catch bugs and security issues before merging.
+  Input: '[commit | BASE..HEAD | branch | PR | uncommitted] [optional: focus hint]'
+  Output: Pass/Fail report with file:line findings committed to git.
 mode: subagent
 temperature: 0
 model: opencode-go/glm-5.1

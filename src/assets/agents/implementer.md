@@ -1,6 +1,10 @@
 ---
 name: implementer
-description: "Implementation agent. Use proactively once a task is scoped and ready to execute. Implements features, bug fixes, and refactors; writes tests; self-verifies via acceptance and code reviewers; returns a completion report with reviewer SHA verdicts. Not for exploration or planning."
+description: >
+  Implements a story end-to-end: writes code and tests, self-verifies via reviewers.
+  Use once a story is planned and ready to execute.
+  Input: path to a story directory.
+  Output: completion report with reviewer SHA verdicts.
 mode: all
 temperature: 0.2
 model: opencode-go/deepseek-v4-flash

@@ -1,6 +1,10 @@
 ---
 name: acceptance-reviewer
-description: "Acceptance reviewer. Runs linter and tests, verifies ≥90% of acceptance criteria are covered by automated tests, and surfaces what's missing. Input: path to a story directory (e.g. stories/001-rust-deno-poc, nothing else is necessary). Outputs Pass or Fail."
+description: >
+  Verifies that an implementation satisfies a story's acceptance criteria.
+  Use after implementation to confirm ACs are covered by automated tests.
+  Input: pass ONLY the path to a story directory (e.g. stories/001-feature). Nothing else.
+  Output: Pass or Fail verdict. Passes only when lint and tests pass and all ACs have automated test coverage.
 mode: subagent
 temperature: 0
 model: opencode-go/deepseek-v4-flash
