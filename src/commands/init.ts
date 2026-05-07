@@ -9,25 +9,30 @@ import acceptanceReviewer from '../assets/agents/acceptance-reviewer.md'
 import codeReviewer from '../assets/agents/code-reviewer.md'
 import implementer from '../assets/agents/implementer.md'
 import planner from '../assets/agents/planner.md'
-import research from '../assets/agents/research.md'
 import reflectSkill from '../assets/skills/reflect/SKILL.md'
-import subagentCompletion from '../assets/plugins/subagent-completion.plugin'
 
 const AGENTS: Record<string, string> = {
   'acceptance-reviewer.md': acceptanceReviewer,
   'code-reviewer.md': codeReviewer,
   'implementer.md': implementer,
   'planner.md': planner,
-  'research.md': research,
 }
 
 const SKILLS: Record<string, string> = {
   'reflect/SKILL.md': reflectSkill,
 }
 
-const PLUGINS: Record<string, string> = {
-  'subagent-completion.ts': subagentCompletion,
+const OPENCODE_JSONC = `{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-subagent-completion-hook"
+  ],
+  "agent": {
+    "plan": { "disable": true },
+    "build": { "disable": true }
+  }
 }
+`
 
 export function initCommand(): Command {
   return new Command('init')
@@ -39,7 +44,7 @@ export function initCommand(): Command {
 
       await installFiles(repoRoot, join('.opencode', 'agents'), AGENTS)
       await installFiles(repoRoot, join('.opencode', 'skills'), SKILLS)
-      await installFiles(repoRoot, join('.opencode', 'plugins'), PLUGINS)
+      await initOpencodeJsonc(repoRoot)
       await initConfig(repoRoot)
 
       console.log('Done.')
@@ -55,6 +60,17 @@ async function initConfig(repoRoot: string): Promise<void> {
   const defaultBranch = await detectDefaultBranch(repoRoot)
   await writeConfig(repoRoot, { version: pkg.version, default_branch: defaultBranch })
   console.log(`  write .opencode/kiss-spec.json (default_branch: ${defaultBranch})`)
+}
+
+async function initOpencodeJsonc(repoRoot: string): Promise<void> {
+  const dest = join(repoRoot, '.opencode', 'opencode.jsonc')
+  if (existsSync(dest)) {
+    console.log('  skip  .opencode/opencode.jsonc (already exists)')
+    return
+  }
+  await mkdir(dirname(dest), { recursive: true })
+  await writeFile(dest, OPENCODE_JSONC, 'utf8')
+  console.log('  write .opencode/opencode.jsonc')
 }
 
 async function installFiles(cwd: string, subdir: string, files: Record<string, string>) {

@@ -126,6 +126,19 @@ describe('kiss-spec code-review commit', () => {
     })
   })
 
+  describe('empty report', () => {
+    it.each([
+      ['empty string', ''],
+      ['whitespace only', '   \n\n   '],
+    ])('exits 1 and does not commit for %s', async (_, input) => {
+      const before = await gitLog(tmpDir, '%H')
+      const { exitCode, stderr } = await runWithStdin(['code-review', 'commit'], tmpDir, input)
+      expect(exitCode).toBe(1)
+      expect(stderr).toMatch(/empty/)
+      expect(await gitLog(tmpDir, '%H')).toBe(before)
+    })
+  })
+
   describe('verdict detection edge cases', () => {
     it('prefers bold **Pass** over bare pass', async () => {
       const report = `this might pass or fail\n\n**Pass**`

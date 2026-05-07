@@ -3,7 +3,7 @@ name: acceptance-reviewer
 description: "Acceptance reviewer. Runs linter and tests, verifies ≥90% of acceptance criteria are covered by automated tests, and surfaces what's missing. Input: path to a story directory (e.g. stories/001-rust-deno-poc, nothing else is necessary). Outputs Pass or Fail."
 mode: subagent
 temperature: 0
-model: opencode-go/minimax-m2.7
+model: opencode-go/deepseek-v4-flash
 variant: low
 tools:
   edit: false
@@ -14,7 +14,8 @@ tools:
   task: false
   webfetch: false
   todowrite: false
-on_complete: kiss-spec acceptance-review commit
+options:
+  on_complete: kiss-spec acceptance-review commit
 ---
 
 You verify that an implementation satisfies a story's acceptance criteria. Final verdict: **Pass** or **Fail**. You are read-only — do not fix, debug, or write code

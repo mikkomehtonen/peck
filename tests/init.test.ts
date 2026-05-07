@@ -34,7 +34,7 @@ describe('kiss-spec init', () => {
   it('installs all agents except orchestrator', async () => {
     await run(['init'], tmpDir)
     const agentsDir = join(tmpDir, '.opencode', 'agents')
-    for (const name of ['planner.md', 'implementer.md', 'code-reviewer.md', 'acceptance-reviewer.md', 'research.md']) {
+    for (const name of ['planner.md', 'implementer.md', 'code-reviewer.md', 'acceptance-reviewer.md']) {
       await expect(access(join(agentsDir, name))).resolves.toBeUndefined()
     }
     await expect(access(join(agentsDir, 'orchestrator.md'))).rejects.toThrow()
@@ -71,6 +71,27 @@ describe('kiss-spec init', () => {
     const { stdout } = await run(['init'], tmpDir)
     expect(stdout).toMatch(/skip/)
     expect(await readFile(dest, 'utf8')).toBe('SENTINEL')
+  })
+
+  it('creates .opencode/opencode.jsonc with plugin reference', async () => {
+    await run(['init'], tmpDir)
+    const dest = join(tmpDir, '.opencode', 'opencode.jsonc')
+    await expect(access(dest)).resolves.toBeUndefined()
+    const content = await readFile(dest, 'utf8')
+    expect(JSON.parse(content)).toMatchObject({
+      $schema: 'https://opencode.ai/config.json',
+      plugin: ['opencode-subagent-completion-hook'],
+      agent: { plan: { disable: true }, build: { disable: true } },
+    })
+  })
+
+  it('skips opencode.jsonc if it already exists', async () => {
+    await run(['init'], tmpDir)
+    const dest = join(tmpDir, '.opencode', 'opencode.jsonc')
+    await writeFile(dest, '{"plugin":[]}', 'utf8')
+    const { stdout } = await run(['init'], tmpDir)
+    expect(stdout).toMatch(/skip.*opencode\.jsonc/)
+    expect(await readFile(dest, 'utf8')).toBe('{"plugin":[]}')
   })
 
   it('exits 1 when not a git repository', async () => {

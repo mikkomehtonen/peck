@@ -17,7 +17,17 @@ function commitReviewCommand(name: string, subjectFormat: string): Command {
     .description(`Commit a ${name} report piped from stdin`)
     .action(async () => {
       const repoRoot = await getRepoRoot(process.cwd())
-      const report = (await Bun.stdin.text()).trim()
+      const raw = (await Bun.stdin.text()).trim()
+      const report = raw
+        .replace(/^task_id:.*\n?/, "")
+        .replace(/<task_result>\n?/g, "")
+        .replace(/<\/task_result>\n?/g, "")
+        .trim()
+
+      if (!report) {
+        process.stderr.write('Report is empty, nothing to commit.\n')
+        process.exit(1)
+      }
 
       const verdict = parseVerdict(report)
       const subject = subjectFormat.replace('${verdict}', verdict ?? 'Unknown')
@@ -27,7 +37,7 @@ function commitReviewCommand(name: string, subjectFormat: string): Command {
         process.stdout.write(`Verdict: Pass\n`)
         process.stdout.write(`Report committed. To view this report again: \`git show ${hash} --format=%B -s\`\n`)
       } else {
-        process.stdout.write(report + '\n\n')
+        process.stdout.write(raw + '\n\n')
         if (verdict === 'Fail') {
           process.stdout.write(`Verdict: Fail\n`)
           process.stdout.write(`You must fix all blocking issues listed above before re-running the reviewer. When re-running, reuse the same task_id if working on the same task.\n`)
