@@ -16,7 +16,7 @@ export interface RunResult {
 
 export async function run(args: string[], cwd: string): Promise<RunResult> {
   try {
-    const { stdout, stderr } = await execFileAsync('bun', [CLI, ...args], { cwd })
+    const { stdout, stderr } = await execFileAsync('node', [CLI, ...args], { cwd })
     return { stdout, stderr, exitCode: 0 }
   } catch (err: any) {
     return {
@@ -29,7 +29,7 @@ export async function run(args: string[], cwd: string): Promise<RunResult> {
 
 export async function runWithStdin(args: string[], cwd: string, stdin: string): Promise<RunResult> {
   return new Promise((resolve) => {
-    const child = spawn('bun', [CLI, ...args], { cwd, stdio: ['pipe', 'pipe', 'pipe'] })
+    const child = spawn('node', [CLI, ...args], { cwd, stdio: ['pipe', 'pipe', 'pipe'] })
     let stdout = ''
     let stderr = ''
     child.stdout.on('data', (d: Buffer) => { stdout += d.toString() })

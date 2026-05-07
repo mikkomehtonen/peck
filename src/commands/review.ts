@@ -1,6 +1,9 @@
 import { Command } from 'commander'
-import { $ } from 'bun'
+import { execFile, spawn } from 'node:child_process'
+import { promisify } from 'node:util'
 import { getRepoRoot } from '../lib/git.js'
+
+const execFileAsync = promisify(execFile)
 
 export function codeReviewCommand(): Command {
   return new Command('code-review')
@@ -17,7 +20,7 @@ function commitReviewCommand(name: string, subjectFormat: string): Command {
     .description(`Commit a ${name} report piped from stdin`)
     .action(async () => {
       const repoRoot = await getRepoRoot(process.cwd())
-      const raw = (await Bun.stdin.text()).trim()
+      const raw = (await readStdin()).trim()
       const report = raw
         .replace(/^task_id:.*\n?/, "")
         .replace(/<task_result>\n?/g, "")
@@ -49,6 +52,12 @@ function commitReviewCommand(name: string, subjectFormat: string): Command {
     })
 }
 
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = []
+  for await (const chunk of process.stdin) chunks.push(chunk as Buffer)
+  return Buffer.concat(chunks).toString('utf8')
+}
+
 // Captures bold (**Pass**/**Fail**) or bare word — bold preferred, last occurrence wins
 const VERDICT_RE = /(\*\*)(pass|fail)\*\*|\b(pass|fail)\b/gi
 
@@ -62,19 +71,27 @@ function parseVerdict(report: string): 'Pass' | 'Fail' | null {
 
 async function commitReport(cwd: string, subject: string, report: string): Promise<string> {
   const message = `${subject}\n\n${report}`
-  const tree = await $`git rev-parse HEAD^{tree}`.cwd(cwd).text()
-  const parent = await $`git rev-parse HEAD`.cwd(cwd).text()
+  const { stdout: treeOut } = await execFileAsync('git', ['rev-parse', 'HEAD^{tree}'], { cwd })
+  const { stdout: parentOut } = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd })
 
-  // Bun.spawn used here because $ splits multiline strings across arguments;
+  // spawn used here because execFile splits multiline strings across arguments;
   // commit-tree expects the full message via stdin with -F -
-  const proc = Bun.spawn(
-    ['git', 'commit-tree', tree.trim(), '-p', parent.trim(), '-F', '-'],
-    { cwd, stdin: new Blob([message]), stdout: 'pipe' }
-  )
-  const hash = (await new Response(proc.stdout).text()).trim()
-  const exitCode = await proc.exited
-  if (exitCode !== 0) throw new Error(`git commit-tree failed with exit code ${exitCode}`)
+  const hash = await new Promise<string>((resolve, reject) => {
+    const proc = spawn(
+      'git',
+      ['commit-tree', treeOut.trim(), '-p', parentOut.trim(), '-F', '-'],
+      { cwd, stdio: ['pipe', 'pipe', 'inherit'] }
+    )
+    let out = ''
+    proc.stdout!.on('data', (d: Buffer) => { out += d.toString() })
+    proc.on('close', (code) => {
+      if (code !== 0) reject(new Error(`git commit-tree failed with exit code ${code}`))
+      else resolve(out.trim())
+    })
+    proc.stdin!.write(message)
+    proc.stdin!.end()
+  })
 
-  await $`git update-ref HEAD ${hash}`.cwd(cwd).quiet()
+  await execFileAsync('git', ['update-ref', 'HEAD', hash], { cwd })
   return hash
 }

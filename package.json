@@ -6,13 +6,17 @@
   "bin": {
     "peck": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "start": "bun dist/index.js",
-    "test": "bun run build && vitest run",
+    "start": "node dist/index.js",
+    "test": "npm run build && vitest run",
     "test:watch": "vitest",
-    "install:local": "bun run build && bun add -g $(pwd)"
+    "install:local": "npm run build && npm install -g .",
+    "publish": "npm run build && npm publish"
   },
   "dependencies": {
     "commander": "^14.0.3"
