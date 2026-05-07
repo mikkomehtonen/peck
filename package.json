@@ -1,5 +1,5 @@
 {
-  "name": "@peck/cli",
+  "name": "peck-cli",
   "version": "0.1.0",
   "description": "Spec-driven development CLI",
   "type": "module",
@@ -16,7 +16,7 @@
     "test": "npm run build && vitest run",
     "test:watch": "vitest",
     "install:local": "npm run build && npm install -g .",
-    "publish": "npm run build && npm publish --access public"
+    "publish": "npm run build && npm publish"
   },
   "dependencies": {
     "commander": "^14.0.3"
