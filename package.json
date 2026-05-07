@@ -16,7 +16,7 @@
     "test": "npm run build && vitest run",
     "test:watch": "vitest",
     "install:local": "npm run build && npm install -g .",
-    "publish": "npm run build && npm publish"
+    "publish": "npm run build && npm publish --access public"
   },
   "dependencies": {
     "commander": "^14.0.3"
