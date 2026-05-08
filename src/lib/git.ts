@@ -29,6 +29,14 @@ export async function detectDefaultBranch(repoRoot: string): Promise<string> {
     // no remote or HEAD not set
   }
 
+  try {
+    const ref = await git(['symbolic-ref', 'HEAD'], repoRoot)
+    const branch = ref.replace('refs/heads/', '').trim()
+    if (branch && CANDIDATE_BRANCHES.includes(branch)) return branch
+  } catch {
+    // detached HEAD
+  }
+
   for (const branch of CANDIDATE_BRANCHES) {
     try {
       await git(['show-ref', '--verify', '--quiet', `refs/heads/${branch}`], repoRoot)

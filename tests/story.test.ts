@@ -82,6 +82,21 @@ describe('peck story create', () => {
     expect(stderr).toMatch(/not a git repository/)
     await removeTmpDir(notGit)
   })
+
+  it('works in a fresh repo with no commits', async () => {
+    const freshDir = await makeTmpDir()
+    await execFileAsync('git', ['init'], { cwd: freshDir })
+    await execFileAsync('git', ['config', 'user.email', 'test@test.com'], { cwd: freshDir })
+    await execFileAsync('git', ['config', 'user.name', 'Test'], { cwd: freshDir })
+    // write config manually since peck init also needs no commits to work
+    await mkdir(join(freshDir, '.opencode'), { recursive: true })
+    await writeFile(join(freshDir, '.opencode', 'peck.json'), JSON.stringify({ version: '0.0.0', default_branch: 'master' }) + '\n')
+    const { exitCode, stdout, stderr } = await run(['story', 'create', 'my feature'], freshDir)
+    expect(exitCode).toBe(0)
+    const json = JSON.parse(stdout)
+    expect(json).toHaveProperty('GIT_BRANCH_NAME')
+    await removeTmpDir(freshDir)
+  })
 })
 
 describe('peck story list', () => {

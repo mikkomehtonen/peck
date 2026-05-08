@@ -25,11 +25,18 @@ export function storyCommand(): Command {
       } catch {
         // non-fatal — offline or no remotes
       }
-      await git(['checkout', config.default_branch], repoRoot)
+      try {
+        const currentBranch = await git(['symbolic-ref', '--short', 'HEAD'], repoRoot)
+        if (currentBranch !== config.default_branch) {
+          await git(['checkout', config.default_branch], repoRoot)
+        }
+      } catch {
+        // fresh repo with no commits — already on the initial branch
+      }
       try {
         await git(['pull', '--ff-only'], repoRoot)
       } catch {
-        // non-fatal — no upstream set
+        // non-fatal — no upstream set or empty repo
       }
 
       const num = await nextFeatureNumber(storiesDir, repoRoot)
