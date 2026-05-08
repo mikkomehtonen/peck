@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { writeFile, readFile, mkdir } from 'node:fs/promises'
+import { writeFile, mkdir } from 'node:fs/promises'
 import { readdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Dirent } from 'node:fs'
@@ -88,16 +88,26 @@ export function storyCommand(): Command {
     })
 
   story
-    .command('load <slug>')
-    .description('Print a story to stdout (pipe into your AI tool)')
-    .action(async (slug: string) => {
+    .command('load <id>')
+    .description('Checkout the story branch and print paths to all files in the story directory')
+    .action(async (id: string) => {
       const repoRoot = await getRepoRoot(process.cwd())
+      const branchName = await findBranchById(repoRoot, id)
+
+      if (!branchName) fatal(`Story not found: ${id}`)
+
+      await git(['checkout', branchName], repoRoot)
+
       const storiesDir = join(repoRoot, 'stories')
-      const storyFile = findStory(storiesDir, slug)
+      const storyDir = join(storiesDir, branchName)
 
-      if (!storyFile) fatal(`Story not found: ${slug}`)
+      if (!existsSync(storyDir)) fatal(`Story directory not found after checkout: ${storyDir}`)
 
-      process.stdout.write(await readFile(storyFile, 'utf8'))
+      const files = readdirSync(storyDir, { withFileTypes: true })
+        .filter((e: Dirent) => e.isFile())
+        .map((e: Dirent) => join(storyDir, e.name))
+
+      process.stdout.write(JSON.stringify({ GIT_BRANCH_NAME: branchName, FILES: files }) + '\n')
     })
 
   return story
@@ -130,12 +140,13 @@ async function highestFromBranches(repoRoot: string): Promise<number> {
   }
 }
 
-function findStory(storiesDir: string, slug: string): string | null {
-  for (const entry of storyDirs(storiesDir)) {
-    if (entry.name === slug || entry.name.endsWith(`-${slug}`) || entry.name.includes(slug)) {
-      const candidate = join(storiesDir, entry.name, 'story.md')
-      if (existsSync(candidate)) return candidate
-    }
+async function findBranchById(repoRoot: string, id: string): Promise<string | null> {
+  const num = id.replace(/^0+/, '') || '0'
+  const output = await git(['branch', '-a'], repoRoot)
+  for (const line of output.split('\n')) {
+    const branch = line.replace(/^[* ]*/, '').replace(/^remotes\/[^/]*\//, '').trim()
+    const m = branch.match(/^(\d+)-/)
+    if (m && m[1].replace(/^0+/, '') === num) return branch
   }
   return null
 }

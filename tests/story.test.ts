@@ -135,16 +135,43 @@ describe('peck story load', () => {
   })
   afterEach(async () => { await removeTmpDir(tmpDir) })
 
-  it('prints the story content to stdout', async () => {
+  it('outputs JSON with GIT_BRANCH_NAME and FILES', async () => {
     const { stdout: created } = await run(['story', 'create', 'my feature'], tmpDir)
     const { GIT_BRANCH_NAME } = JSON.parse(created)
-    const { exitCode, stdout } = await run(['story', 'load', GIT_BRANCH_NAME], tmpDir)
+    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
+      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
+    )
+    const { exitCode, stdout } = await run(['story', 'load', '1'], tmpDir)
     expect(exitCode).toBe(0)
-    expect(stdout).toMatch(/Story Title/)
+    const json = JSON.parse(stdout)
+    expect(json.GIT_BRANCH_NAME).toBe(GIT_BRANCH_NAME)
+    expect(Array.isArray(json.FILES)).toBe(true)
+    expect(json.FILES.some((f: string) => f.endsWith('story.md'))).toBe(true)
+  })
+
+  it('accepts zero-padded and plain IDs', async () => {
+    await run(['story', 'create', 'my feature'], tmpDir)
+    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
+      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
+    )
+    const { exitCode: e1 } = await run(['story', 'load', '001'], tmpDir)
+    expect(e1).toBe(0)
+    const { exitCode: e2 } = await run(['story', 'load', '1'], tmpDir)
+    expect(e2).toBe(0)
+  })
+
+  it('checks out the story branch', async () => {
+    await run(['story', 'create', 'my feature'], tmpDir)
+    await execFileAsync('git', ['checkout', 'master'], { cwd: tmpDir }).catch(() =>
+      execFileAsync('git', ['checkout', 'main'], { cwd: tmpDir })
+    )
+    await run(['story', 'load', '1'], tmpDir)
+    const { stdout: branch } = await execFileAsync('git', ['symbolic-ref', '--short', 'HEAD'], { cwd: tmpDir })
+    expect(branch.trim()).toMatch(/^001-my-feature$/)
   })
 
   it('exits 1 for a missing story', async () => {
-    const { exitCode, stderr } = await run(['story', 'load', 'does-not-exist'], tmpDir)
+    const { exitCode, stderr } = await run(['story', 'load', '99'], tmpDir)
     expect(exitCode).toBe(1)
     expect(stderr).toMatch(/not found/)
   })
