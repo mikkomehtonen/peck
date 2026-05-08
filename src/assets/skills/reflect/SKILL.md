@@ -1,6 +1,6 @@
 ---
 name: reflect
-description: Post-task reflection on what could have been done better. Used by /implement at completion.
+description: Runs post-task reflection to extract learnings from the completed session. Use after finishing any non-trivial task to update docs/learnings.md or AGENTS.md with concrete takeaways.
 ---
 
 # Post-Task Reflection
@@ -49,16 +49,16 @@ There are only two destinations. Use this decision rule:
 - **Does this describe a specific incident that might recur but isn't generalizable yet?** → Append to `docs/learnings.md`.
 - **Has it already happened twice?** → It's a pattern now. Promote to `AGENTS.md` and remove from learnings.
 
-Do NOT split across multiple learnings files. Everything goes in one file.
+Use `docs/learnings.md` as the sole learnings file — do not create additional files.
 
 ## Step 4: Check for duplicates and prune
 
-Read `docs/learnings.md` and any main repo docs you plan to update.
+Read `docs/learnings.md` and any main repo docs you plan to update. Note the current entry count before writing.
 
 - If an equivalent item already exists, skip it.
 - If an existing learning has been promoted to `AGENTS.md`, remove it from learnings.
 - If an existing learning is no longer true (code changed, approach abandoned), remove it.
-- Keep total entries in `docs/learnings.md` under 15. If over the cap, promote the most general entries to `AGENTS.md` or delete the least useful ones.
+- Keep total entries in `docs/learnings.md` under 15 — beyond that, the log becomes hard to scan and the most important entries lose signal. If over the cap, promote the most general entries to `AGENTS.md` or delete the least useful ones.
 
 ## Step 5: Write
 
@@ -67,7 +67,7 @@ Format for `docs/learnings.md`:
 ```
 ## Title
 **Date**: YYYY-MM-DD
-**Area**: rust/napi | testing | input | rendering | workflow | architecture
+**Area**: [area relevant to this repo, e.g. testing | workflow | architecture | build]
 **What happened**: 1-2 sentences — what went wrong or what was discovered
 **Takeaway**: concrete lesson — what to do differently
 
@@ -78,6 +78,8 @@ The file header is `# Learnings`. Create the file with this header if it doesn't
 
 If an item belongs in `AGENTS.md` instead, make the minimal update there and mention it in your summary.
 
-## Step 6: User review and commit
+## Step 6: Commit
 
-Tell the user what was written and where. Ask the user to confirm. If the user approves, commit the changes.
+Tell the user what was written and where. Commit the changes immediately.
+
+If the only changes are to documentation files (e.g. `docs/learnings.md`, `AGENTS.md`), skip running any code reviewers — they are not needed for docs-only updates.
