@@ -32,6 +32,7 @@ copy_revim() {
   git -C "$REVIM_TMP" reset --hard "$checkout" --quiet
   (cd "$REVIM_TMP" && bun "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/dist/index.js" init)
   sed -i "s|^mode: subagent|mode: all|" "$REVIM_TMP/.opencode/agents/$agent_file"
+  sed -i "/^  on_complete:/d; /^options:$/d" "$REVIM_TMP/.opencode/agents/$agent_file"
   [[ -n "$model_id" ]] && sed -i "s|^model:.*|model: $model_id|" "$REVIM_TMP/.opencode/agents/$agent_file"
   git -C "$REVIM_TMP" add .opencode
   git -C "$REVIM_TMP" commit --quiet -m "chore: peck init"

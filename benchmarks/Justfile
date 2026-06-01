@@ -1,10 +1,11 @@
 code-reviewer case:
-    ./run-parallel.sh --benchmark revim-code-reviewer --case {{case}} \
+    ./run-parallel.sh --benchmark revim-code-reviewer --runs 2 --case {{case}} \
         --model kimi-k2.6 \
-        --model minimax-m2.7 \
-        --model deepseek-v4-flash \
+        --model minimax-m3 \
         --model deepseek-v4-flash:high \
+        --model deepseek-v4-flash:max \
         --model deepseek-v4-pro:high \
         --model deepseek-v4-pro:max \
         --model glm-5.1 \
-        --model qwen3.6-plus
+        --model qwen3.6-plus \
+        --model qwen3.7-max
