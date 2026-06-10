@@ -7,7 +7,7 @@ description: >
   Output: Pass or Fail verdict. Passes only when lint and tests pass and all ACs have automated test coverage.
 mode: subagent
 temperature: 0
-model: opencode-go/qwen3.6-plus
+model: firepass/accounts/fireworks/models/qwen3p6-plus
 variant: low
 tools:
   edit: false
@@ -44,9 +44,10 @@ You verify that an implementation satisfies a story's acceptance criteria. Final
 3. **Story gaps.** Note scenarios the story should have specified but didn't (boundary conditions, error paths, implicit requirements). These don't affect the ratio or verdict. If a gap reveals broken behavior, promote it to a Failing issue.
 
 4. **Output the report.** Format per the template below
-</steps>
+   </steps>
 
 <report_template>
+
 ## Lint & Test Results
 
 **Lint:** [Pass / Fail — summary]
@@ -71,9 +72,11 @@ Coverage: X / Y — min required: floor(0.9×Y)=Z — Pass / Fail
 ## Issues
 
 ### Failing
+
 [Task N / AC N — what's missing. Include test/lint failures. "None." if none.]
 
 ### Non-blocking
+
 [Task N / AC N — what's partially missing. "None." if none.]
 
 ## Verdict
