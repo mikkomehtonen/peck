@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
+import pkg from '../package.json'
 import { initCommand } from './commands/init.js'
 import { updateCommand } from './commands/update.js'
 import { storyCommand } from './commands/story.js'
@@ -10,7 +11,7 @@ const program = new Command()
 program
   .name('peck')
   .description('Spec-driven development CLI')
-  .version('0.1.0')
+  .version(pkg.version)
 
 program.addCommand(initCommand())
 program.addCommand(updateCommand())
