@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
 import { initCommand } from './commands/init.js'
+import { updateCommand } from './commands/update.js'
 import { storyCommand } from './commands/story.js'
 import { codeReviewCommand, acceptanceReviewCommand } from './commands/review.js'
 
@@ -12,6 +13,7 @@ program
   .version('0.1.0')
 
 program.addCommand(initCommand())
+program.addCommand(updateCommand())
 program.addCommand(storyCommand())
 program.addCommand(codeReviewCommand())
 program.addCommand(acceptanceReviewCommand())
