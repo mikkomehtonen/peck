@@ -7,7 +7,7 @@ description: >
   Output: completion report with reviewer SHA verdicts.
 mode: all
 temperature: 0.2
-model: fireworks-ai/accounts/fireworks/models/kimi-k2p7-code
+model: accounts/fireworks/models/deepseek-v4-flash-0731
 tools:
   question: false
   task: true
