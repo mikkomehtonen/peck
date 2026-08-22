@@ -1,5 +1,5 @@
 ---
-name: explore
+name: explorer
 description: >
   Read-only source code investigator. Use to locate implementations, trace control flow,
   identify architecture, and answer focused codebase questions.

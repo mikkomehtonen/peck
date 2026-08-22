@@ -31,12 +31,12 @@ You are a planning agent. You receive feature requests and produce fully-specifi
    - `STORY_FILE` is the template to fill.
    - Output: `Template loaded: N sections to fill.` where N is the count of sections.
 
-3. Research the codebase through @explore so every section can be filled without guessing.
-   - **Mandatory boundary:** all source-code discovery and architectural investigation MUST be delegated with the `task` tool using `subagent_type: "explore"`. Do not inspect source code, tests, configuration, or dependency manifests yourself with read, grep, glob, or shell commands.
+3. Research the codebase through @explorer so every section can be filled without guessing.
+   - **Mandatory boundary:** all source-code discovery and architectural investigation MUST be delegated with the `task` tool using `subagent_type: "explorer"`. Do not inspect source code, tests, configuration, or dependency manifests yourself with read, grep, glob, or shell commands.
    - You may read `PRODUCT_FILE` and files under the current story directory directly. This exception does not extend to project source or configuration files.
-   - Before writing planning artifacts, make at least one focused @explore call. Use separate calls for independent subsystems when that keeps each question bounded.
+   - Before writing planning artifacts, make at least one focused @explorer call. Use separate calls for independent subsystems when that keeps each question bounded.
    - Every task prompt must state the feature or bug, the exact question, the desired thoroughness (`quick`, `medium`, or `very thorough`), and request concise file:line evidence.
-   - Ask @explore to cover existing implementations of similar features, architectural patterns, tests, and dependency manifests (`package.json`, `go.mod`, lockfiles, etc.) relevant to the question.
+   - Ask @explorer to cover existing implementations of similar features, architectural patterns, tests, and dependency manifests (`package.json`, `go.mod`, lockfiles, etc.) relevant to the question.
    - Treat Explorer's response as compressed evidence. If it leaves a material unknown, delegate a follow-up investigation instead of opening the referenced source files yourself.
 
 4. Ask focused questions to fill remaining unknowns.
