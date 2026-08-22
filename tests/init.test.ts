@@ -34,10 +34,18 @@ describe('peck init', () => {
   it('installs all agents except orchestrator', async () => {
     await run(['init'], tmpDir)
     const agentsDir = join(tmpDir, '.opencode', 'agents')
-    for (const name of ['planner.md', 'implementer.md', 'code-reviewer.md', 'acceptance-reviewer.md']) {
+    for (const name of ['planner.md', 'implementer.md', 'explore.md', 'code-reviewer.md', 'acceptance-reviewer.md']) {
       await expect(access(join(agentsDir, name))).resolves.toBeUndefined()
     }
     await expect(access(join(agentsDir, 'orchestrator.md'))).rejects.toThrow()
+  })
+
+  it('installs explore as a read-only subagent', async () => {
+    await run(['init'], tmpDir)
+    const content = await readFile(join(tmpDir, '.opencode', 'agents', 'explore.md'), 'utf8')
+    expect(content).toMatch(/mode: subagent/)
+    expect(content).toMatch(/"\*": deny/)
+    expect(content).toMatch(/read: allow/)
   })
 
   it('creates the reflect skill directory and SKILL.md', async () => {

@@ -3,6 +3,7 @@ import { join, dirname } from 'node:path'
 import { existsSync } from 'node:fs'
 import acceptanceReviewer from '../assets/agents/acceptance-reviewer.md'
 import codeReviewer from '../assets/agents/code-reviewer.md'
+import explore from '../assets/agents/explore.md'
 import implementer from '../assets/agents/implementer.md'
 import planner from '../assets/agents/planner.md'
 import reflectSkill from '../assets/skills/reflect/SKILL.md'
@@ -13,6 +14,7 @@ export const SKILLS_DIR = join('.opencode', 'skills')
 export const AGENTS: Record<string, string> = {
   'acceptance-reviewer.md': acceptanceReviewer,
   'code-reviewer.md': codeReviewer,
+  'explore.md': explore,
   'implementer.md': implementer,
   'planner.md': planner,
 }

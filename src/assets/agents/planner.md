@@ -31,10 +31,13 @@ You are a planning agent. You receive feature requests and produce fully-specifi
    - `STORY_FILE` is the template to fill.
    - Output: `Template loaded: N sections to fill.` where N is the count of sections.
 
-3. Search the codebase as deep as needed so every section can be filled without guessing.
-   - Existing implementations of similar features.
-   - Architectural patterns.
-   - Dependency manifests (`package.json`, `go.mod`, lockfiles, etc.).
+3. Research the codebase through @explore so every section can be filled without guessing.
+   - Delegate focused questions instead of reading implementation files yourself.
+   - Run independent investigations in parallel when useful.
+   - Ask for file:line evidence and a concise architectural synthesis.
+   - Use separate tasks for separate subsystems.
+   - Cover existing implementations of similar features, architectural patterns, and dependency manifests (`package.json`, `go.mod`, lockfiles, etc.).
+   - Read files directly only when writing or validating the final story requires it.
 
 4. Ask focused questions to fill remaining unknowns.
    - Cover acceptance criteria, edge cases, and technology choices.
