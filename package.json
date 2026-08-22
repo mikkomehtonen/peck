@@ -1,6 +1,6 @@
 {
   "name": "peck-cli",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Spec-driven development CLI",
   "type": "module",
   "bin": {
