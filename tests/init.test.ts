@@ -48,6 +48,14 @@ describe('peck init', () => {
     expect(content).toMatch(/read: allow/)
   })
 
+  it('requires planner to delegate source-code research to explore', async () => {
+    await run(['init'], tmpDir)
+    const content = await readFile(join(tmpDir, '.opencode', 'agents', 'planner.md'), 'utf8')
+    expect(content).toContain('subagent_type: "explore"')
+    expect(content).toContain('Do not inspect source code')
+    expect(content).toContain('make at least one focused @explore call')
+  })
+
   it('creates the reflect skill directory and SKILL.md', async () => {
     await run(['init'], tmpDir)
     const dest = join(tmpDir, '.opencode', 'skills', 'reflect', 'SKILL.md')

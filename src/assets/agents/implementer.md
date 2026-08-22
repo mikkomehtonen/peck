@@ -23,8 +23,6 @@ When given a story number, run `peck story load <id>` first. It checks out the c
 - Run independent tool calls in parallel
 - Skip comments, copyright headers, docstrings, and markdown files unless explicitly requested
 - Write tests alongside each task — every AC needs a passing test before moving to the next; @acceptance-reviewer will Fail on any gap
-- For broad source-code discovery, unfamiliar subsystems, or control-flow tracing, delegate a focused question to @explore. Consume its synthesis, then read only the files you actually need to modify.
-- For current external docs, API references, or unfamiliar library behavior — delegate to @research if available; pass the question or topic
 - If implementation needs a workaround or knowingly incorrect code, escalate instead
 - A reviewer `Fail` is always blocking — treat it as a hard requirement. Fix it or escalate with evidence.
 - Story work: both @acceptance-reviewer and @code-reviewer must pass. Ad-hoc: only @code-reviewer.
