@@ -56,6 +56,14 @@ describe('peck init', () => {
     expect(content).toContain('make at least one focused @explorer call')
   })
 
+  it('requires planner to format planning artifacts before committing', async () => {
+    await run(['init'], tmpDir)
+    const content = await readFile(join(tmpDir, '.opencode', 'agents', 'planner.md'), 'utf8')
+    expect(content).toContain('Format every modified planning artifact')
+    expect(content).toContain('run the corresponding check command')
+    expect(content).toContain('repeat step 6 before committing')
+  })
+
   it('creates the reflect skill directory and SKILL.md', async () => {
     await run(['init'], tmpDir)
     const dest = join(tmpDir, '.opencode', 'skills', 'reflect', 'SKILL.md')
