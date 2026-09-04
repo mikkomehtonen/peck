@@ -7,7 +7,7 @@ description: >
   Output: committed story file with acceptance criteria and implementation approach.
 mode: all
 temperature: 0.2
-model: fireworks-ai/accounts/fireworks/models/glm-5p2
+model: kolibri/dirk-qwen3.8-27b
 tools:
   task: true
   grep: false

@@ -7,7 +7,7 @@ description: >
   Output: concise answer with file:line evidence.
 mode: subagent
 temperature: 0.1
-model: accounts/fireworks/models/deepseek-v4-flash-0731
+model: isoruokki/qwen3.6-35b-a3b
 steps: 20
 permission:
   "*": deny

@@ -7,8 +7,7 @@ description: >
   Output: Pass or Fail verdict. Passes only when lint and tests pass and all ACs have automated test coverage.
 mode: subagent
 temperature: 0
-model: fireworks-ai/accounts/fireworks/models/qwen3p7-plus
-variant: low
+model: kolibri/dirk-qwen3.8-27b
 tools:
   edit: false
   grep: false
