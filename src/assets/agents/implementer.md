@@ -6,8 +6,8 @@ description: >
   Input: path to a story directory.
   Output: completion report with reviewer SHA verdicts.
 mode: all
-temperature: 0.5
-model: isoruokki/qwen3.6-35b-a3b
+temperature: 0.7
+model: isoruokki/qwen3.8-flash-next-iq3_s
 tools:
   question: false
   task: true

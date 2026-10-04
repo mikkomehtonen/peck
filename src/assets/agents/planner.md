@@ -6,8 +6,8 @@ description: >
   Input: feature description or bug report.
   Output: committed story file with acceptance criteria and implementation approach.
 mode: all
-temperature: 0.2
-model: kolibri/dirk-qwen3.8-27b
+temperature: 0.7
+model: isoruokki/qwen3.8-flash-next-iq3_s
 tools:
   task: true
   grep: false

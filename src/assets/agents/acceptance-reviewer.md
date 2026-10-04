@@ -6,8 +6,9 @@ description: >
   Input: pass ONLY the path to a story directory (e.g. stories/001-feature). Nothing else.
   Output: Pass or Fail verdict. Passes only when lint and tests pass and all ACs have automated test coverage.
 mode: subagent
-temperature: 0
-model: kolibri/dirk-qwen3.8-27b
+temperature: 0.1
+model: isoruokki/qwen3.8-flash-next-iq3_s
+variant: low
 tools:
   edit: false
   grep: false

@@ -7,7 +7,8 @@ description: >
   Output: Pass/Fail report with file:line findings committed to git.
 mode: subagent
 temperature: 0
-model: isoruokki/qwen3.6-35b-a3b
+model: pareto-llm/current
+variant: low
 tools:
   edit: false
   grep: false
