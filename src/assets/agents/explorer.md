@@ -8,8 +8,8 @@ description: >
   Output: concise answer with file:line evidence.
 mode: subagent
 temperature: 0.1
-model: fireworks-ai/accounts/fireworks/models/nemotron-lightning-3p5-30b-a3b
-steps: 20
+model: isoruokki2/ling-3.0-tiny
+steps: 25
 permission:
   "*": deny
   read: allow
